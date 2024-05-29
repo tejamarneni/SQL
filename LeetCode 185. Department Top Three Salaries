@@ -1,0 +1,17 @@
+SELECT
+    Department,
+    Employee,
+    Salary
+FROM
+(SELECT
+    D.name as Department,
+    E.name AS Employee,
+    E.salary AS Salary,
+    --DENSE_RANK() OVER(PARTITION BY D.name ORDER BY E.salary DESC) AS rnk
+    (SELECT COUNT(DISTINCT salary) FROM Employee AS Em WHERE Em.salary >= E.salary AND E.departmentId = Em.departmentId) AS rnk
+FROM
+    Employee AS E JOIN
+    Department AS D ON
+    E.departmentId = D.id) AS RES
+WHERE
+    rnk <= 3
