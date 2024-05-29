@@ -1,0 +1,15 @@
+SELECT
+    E1.id,
+    E1.month,
+    SUM(E2.salary) as Salary
+FROM
+    employee AS E1 JOIN Employee AS E2 ON
+    E1.id = E2.id AND (E1.month - E2.month) BETWEEN 0 AND 2
+WHERE
+    E1.month NOT IN (SELECT MAX(E3.month) FROM Employee AS E3 WHERE E1.id = E3.id)
+GROUP BY
+    E1.id,
+    E1.month
+ORDER BY
+    E1.id,
+    E1.month DESC
