@@ -1,0 +1,28 @@
+SELECT 
+    item_category as Category,
+    ISNULL(MONDAY,0) AS Monday,
+    ISNULL(TUESDAY,0) AS Tuesday,
+    ISNULL(WEDNESDAY,0) AS Wednesday,
+    ISNULL(THURSDAY,0) AS Thursday,
+    ISNULL(FRIDAY,0) AS Friday,
+    ISNULL(SATURDAY,0) AS Saturday,
+    ISNULL(SUNDAY,0) AS Sunday
+FROM
+(SELECT
+    item_category,
+    DATENAME(weekday, order_date) AS day_name,
+    quantity
+FROM
+    Orders AS O RIGHT JOIN Items AS I ON
+    I.item_id = O.item_id) AS RES
+PIVOT
+(SUM(quantity) 
+FOR day_name in 
+    ([Monday],
+    [Tuesday],
+    [Wednesday],
+    [Thursday],
+    [Friday],
+    [Saturday],
+    [Sunday])
+) AS pt
