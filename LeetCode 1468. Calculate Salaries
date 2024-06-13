@@ -1,0 +1,21 @@
+WITH m_sal AS
+(SELECT
+    company_id,
+    MAX(salary) AS max_cmp_salary
+FROM
+    Salaries
+GROUP BY
+    company_id) 
+
+SELECT
+    S.company_id,
+    S.employee_id,
+    S.employee_name,
+    CASE 
+        WHEN max_cmp_salary < 1000 THEN salary
+        WHEN max_cmp_salary >= 1000 AND max_cmp_salary <= 10000 THEN ROUND(salary * .76,0)
+        WHEN max_cmp_salary > 10000 THEN ROUND(salary * .51,0)
+    END AS salary
+FROM
+    Salaries AS S JOIN m_sal AS M ON
+    S.company_id = M.company_id
