@@ -1,0 +1,38 @@
+/* Write your T-SQL query statement below */
+WITH CTE AS
+(SELECT
+*,
+RANK() OVER(PARTITION BY exam_id ORDER BY SCORE DESC) as high_rank,
+RANK() OVER(PARTITION BY exam_id ORDER BY SCORE ) as low_rank
+FROM
+Exam
+WHERE 
+    exam_id NOT IN (SELECT exam_id FROM exam GROUP BY exam_id HAVING COUNT(exam_id) = 1)),
+
+
+MIN_MAX AS
+(SELECT
+    C.student_id,
+    MIN(high_rank) as first_rank,
+    MIN(low_rank) as last_rank
+FROM
+    CTE AS C 
+
+GROUP BY
+    C.student_id)
+
+SELECT
+    S.student_id,
+    S.student_name
+FROM
+    Student AS S JOIN
+    MIN_MAX AS E ON
+    S.student_id = E.student_id
+WHERE
+    first_rank != 1 AND last_rank != 1
+
+
+
+
+
+
