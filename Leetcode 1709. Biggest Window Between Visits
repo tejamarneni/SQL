@@ -1,0 +1,17 @@
+
+with cte as (
+select 
+    user_id, 
+    datediff(day, visit_date, coalesce(lead(visit_date) over(partition by user_id order by visit_date), '2021-01-01')) as    biggest_window,
+    visit_date
+from UserVisits)
+
+select 
+    user_id, 
+    max(biggest_window) as biggest_window
+from 
+    cte
+group by 
+    user_id
+order by 
+    user_id
