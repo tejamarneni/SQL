@@ -1,0 +1,15 @@
+--MySQL
+
+WITH CTE AS
+(
+    SELECT
+        *,
+        ROW_NUMBER() OVER() as rn
+    FROM Point2D
+)
+
+SELECT
+    ROUND(MIN(SQRT(POW((c1.x - c2.x),2) + POW((c1.y - c2.y),2))),2) AS shortest
+FROM
+    CTE AS C1 JOIN CTE AS C2 ON
+    C1.rn < c2.rn
