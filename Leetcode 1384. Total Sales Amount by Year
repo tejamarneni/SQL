@@ -1,0 +1,50 @@
+
+WITH CTE AS
+(
+    SELECT 
+        MIN(period_start) AS min_period,
+        MAX(period_end) AS max_period
+    FROM
+        Sales
+
+    UNION ALL
+
+    SELECT
+        DATEADD(DAY,1,min_period),
+        max_period
+    FROM
+        CTE
+    WHERE
+        min_period < max_period
+),
+CTE2 AS
+(SELECT 
+    p.product_id,
+    p.product_name, 
+    YEAR(c.min_period) AS report_year,
+    s.average_daily_sales
+FROM 
+    cte AS c LEFT JOIN 
+    Sales AS s ON
+    c.min_period >= s.period_start AND 
+    c.min_period <= s.period_end RIGHT JOIN
+    Product  AS p ON
+    s.product_id = p.product_id)
+
+
+SELECT
+    product_id,
+    product_name,
+    CAST(report_year AS VARCHAR(4)) as report_year,
+    SUM(average_daily_sales) AS total_amount
+FROM
+    cte2
+GROUP BY
+    product_id,
+    product_name,
+    report_year 
+ORDER BY
+    product_id,
+    report_year
+
+OPTION (MAXRECURSION 0);
