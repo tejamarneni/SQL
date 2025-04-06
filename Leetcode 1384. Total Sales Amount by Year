@@ -1,3 +1,5 @@
+-- The default recursion limit for MS SQL is 100. OPTION MAXRECURSION 0 will set the unlimited recursions
+
 
 WITH CTE AS
 (
