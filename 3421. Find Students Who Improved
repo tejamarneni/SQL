@@ -1,0 +1,42 @@
+WITH first_date AS
+(SELECT *
+FROM
+(SELECT
+    *
+   ,MIN(exam_date) OVER(PARTITION BY student_id, subject ORDER BY exam_date) as min_date
+   ,COUNT(subject) OVER(PARTITION BY student_id) as cnt
+FROM
+    Scores) AS R1
+WHERE
+    exam_date = min_date
+    AND cnt >= 2),
+
+final_date AS
+(SELECT *
+FROM
+(SELECT
+    *
+   ,MAX(exam_date) OVER(PARTITION BY student_id, subject ORDER BY exam_date DESC) as max_date
+   ,COUNT(subject) OVER(PARTITION BY student_id) as cnt
+FROM
+    Scores) AS R2
+WHERE
+    exam_date = max_date
+    AND cnt >= 2)
+
+SELECT
+    f1.student_id AS student_id
+   ,f1.subject AS subject
+   ,f1.score AS first_score
+   ,f2.score AS latest_score
+FROM
+    first_date AS f1 
+    JOIN final_date AS f2 
+    ON f1.student_id = f2.student_id
+    AND f1.subject = f2.subject
+WHERE
+    f2.score > f1.score
+    AND min_date != max_date
+ORDER BY
+    f1.student_id
+   ,f1.subject
